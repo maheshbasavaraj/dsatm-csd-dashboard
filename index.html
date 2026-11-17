@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dept Dashboard — CSE (Data Science) · DSATM</title>
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 40 40" width="38" height="38"><rect x="1.5" y="1.5" width="37" height="37" rx="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="27" r="2.6" fill="currentColor"/><circle cx="20" cy="14" r="2.6" fill="currentColor"/><circle cx="28" cy="24" r="2.6" fill="currentColor"/><circle cx="29" cy="10" r="2.6" fill="currentColor"/><path d="M12 27 20 14 28 24M20 14 29 10M12 27 28 24" stroke="currentColor" stroke-width="1.6" fill="none" opacity=".65"/></svg>
+    </div>
+    <div>
+      <h1 id="deptName">CSE (Data Science)</h1>
+      <p class="brand-sub"><span id="collegeName">DSATM</span> · Department Dashboard</p>
+    </div>
+  </div>
+
+  <div class="topbar-actions">
+    <label class="field">
+      <span>Academic year</span>
+      <select id="yearSelect"></select>
+    </label>
+    <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+    <button class="icon-btn" id="adminBtn" title="Admin / edit data" aria-label="Admin">✎</button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs" role="tablist">
+  <button class="tab active" data-tab="overview" role="tab">Overview</button>
+  <button class="tab" data-tab="placements" role="tab">Placements</button>
+  <button class="tab" data-tab="research" role="tab">Research</button>
+  <button class="tab" data-tab="calendar" role="tab">Calendar</button>
+  <button class="tab" data-tab="faculty" role="tab">Faculty</button>
+</nav>
+
+<main>
+
+  <!-- ============ OVERVIEW ============ -->
+  <section class="panel active" id="panel-overview">
+    <div class="kpis" id="kpiGrid"></div>
+    <div class="grid-2">
+      <article class="card">
+        <header class="card-head"><h2>Placement trend</h2><span class="hint">students placed / eligible</span></header>
+        <div id="trendChart" class="chart-wrap"></div>
+      </article>
+      <article class="card">
+        <header class="card-head"><h2>What's next</h2><span class="hint">next 5 department dates</span></header>
+        <ul class="next-list" id="nextList"></ul>
+      </article>
+    </div>
+    <div class="grid-2">
+      <article class="card">
+        <header class="card-head"><h2>Research output</h2><span class="hint">this academic year</span></header>
+        <div id="researchMini" class="chart-wrap"></div>
+      </article>
+      <article class="card">
+        <header class="card-head"><h2>Headline numbers</h2><span class="hint">selected year</span></header>
+        <div id="headlines" class="headlines"></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ PLACEMENTS ============ -->
+  <section class="panel" id="panel-placements">
+    <div class="stat-row" id="placementStats"></div>
+    <div class="grid-2">
+      <article class="card">
+        <header class="card-head"><h2>Package distribution</h2><span class="hint">offers by CTC band</span></header>
+        <div id="packageChart" class="chart-wrap"></div>
+      </article>
+      <article class="card">
+        <header class="card-head"><h2>Offer split</h2><span class="hint">by role family</span></header>
+        <div id="roleSplit" class="chart-wrap"></div>
+      </article>
+    </div>
+    <article class="card">
+      <header class="card-head">
+        <h2>Recruiters</h2>
+        <span class="hint" id="recruiterCount"></span>
+      </header>
+      <div class="table-wrap">
+        <table class="data-table" id="recruiterTable">
+          <thead>
+            <tr><th>Company</th><th>Sector</th><th class="num">Offers</th><th>Role</th><th class="num">CTC (LPA)</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+    <article class="card">
+      <header class="card-head"><h2>Year-on-year</h2><span class="hint">placement summary, last 4 cycles</span></header>
+      <div class="table-wrap">
+        <table class="data-table" id="placementYearTable">
+          <thead><tr><th>Academic year</th><th class="num">Eligible</th><th class="num">Placed</th><th class="num">Higher studies</th><th class="num">Offers</th><th class="num">Avg CTC</th><th class="num">Highest</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ RESEARCH ============ -->
+  <section class="panel" id="panel-research">
+    <div class="stat-row" id="researchStats"></div>
+    <article class="card">
+      <header class="card-head">
+        <h2>Publications, patents &amp; grants</h2>
+        <span class="hint" id="researchCount"></span>
+      </header>
+      <div class="filters">
+        <input type="search" id="researchSearch" placeholder="Search title, author, venue…" />
+        <select id="filterType"><option value="">All types</option></select>
+        <select id="filterFaculty"><option value="">All faculty</option></select>
+        <select id="filterYear"><option value="">All years</option></select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="researchTable">
+          <thead><tr><th>Title</th><th>Type</th><th>Faculty</th><th>Venue / details</th><th>Indexing</th><th>Year</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+    <div class="grid-2">
+      <article class="card">
+        <header class="card-head"><h2>Output by year</h2><span class="hint">stacked by type</span></header>
+        <div id="researchYearChart" class="chart-wrap"></div>
+      </article>
+      <article class="card">
+        <header class="card-head"><h2>Faculty-wise output</h2><span class="hint">papers, patents, grants</span></header>
+        <div id="facultyOutput" class="chart-wrap"></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ CALENDAR ============ -->
+  <section class="panel" id="panel-calendar">
+    <div class="stat-row" id="calendarStats"></div>
+    <div class="grid-2">
+      <article class="card">
+        <header class="card-head"><h2>Upcoming</h2><span class="hint">IA, SEE, events &amp; deadlines</span></header>
+        <div class="filters">
+          <select id="filterEventType"><option value="">All types</option></select>
+          <label class="check"><input type="checkbox" id="onlyUpcoming" checked /> upcoming only</label>
+        </div>
+        <ul class="timeline" id="eventList"></ul>
+      </article>
+      <div class="stack">
+        <article class="card">
+          <header class="card-head"><h2>Internal assessment schedule</h2><span class="hint">semester plan</span></header>
+          <div class="table-wrap">
+            <table class="data-table" id="iaTable">
+              <thead><tr><th>Assessment</th><th>Window</th><th>Coverage</th><th>Marks</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="card">
+          <header class="card-head"><h2>Semester map</h2><span class="hint">odd / even cycle</span></header>
+          <div id="semesterMap" class="sem-map"></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACULTY ============ -->
+  <section class="panel" id="panel-faculty">
+    <div class="faculty-grid" id="facultyGrid"></div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span id="footLeft"></span>
+  <span id="footRight"></span>
+</footer>
+
+<!-- ============ ADMIN DRAWER ============ -->
+<aside class="drawer" id="adminDrawer" aria-hidden="true">
+  <header class="drawer-head">
+    <h2>Edit dashboard data</h2>
+    <button class="icon-btn" id="closeAdmin" aria-label="Close">✕</button>
+  </header>
+  <p class="note">Changes save to this browser only. Click <b>Export data.js</b> and replace <code>assets/data.js</code> to publish them for everyone.</p>
+
+  <div class="drawer-body">
+    <details open>
+      <summary>Add recruiter / offer</summary>
+      <div class="form-grid">
+        <label>Company<input id="f-co-name" placeholder="e.g. Tredence" /></label>
+        <label>Sector<input id="f-co-sector" placeholder="Analytics" /></label>
+        <label>Offers<input id="f-co-offers" type="number" min="1" value="1" /></label>
+        <label>Role<input id="f-co-role" placeholder="Data Analyst" /></label>
+        <label>CTC (LPA)<input id="f-co-ctc" type="number" step="0.1" placeholder="6.5" /></label>
+        <button class="btn" data-add="recruiter">Add</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>Add publication / patent / grant</summary>
+      <div class="form-grid">
+        <label>Type
+          <select id="f-re-type">
+            <option>Journal</option><option>Conference</option><option>Patent</option>
+            <option>Book chapter</option><option>Grant</option>
+          </select>
+        </label>
+        <label>Year<input id="f-re-year" type="number" value="2026" /></label>
+        <label class="wide">Title<input id="f-re-title" placeholder="Paper or patent title" /></label>
+        <label>Faculty (comma sep.)<input id="f-re-faculty" placeholder="Dr. A, Prof. B" /></label>
+        <label>Venue / details<input id="f-re-venue" placeholder="Journal name / patent no." /></label>
+        <label>Indexing
+          <select id="f-re-index">
+            <option>SCI</option><option>Scopus</option><option>UGC-CARE</option>
+            <option>WoS</option><option>Granted</option><option>Published</option>
+          </select>
+        </label>
+        <label class="wide">DOI / link<input id="f-re-doi" placeholder="https://…" /></label>
+        <button class="btn" data-add="research">Add</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>Add calendar date</summary>
+      <div class="form-grid">
+        <label>Date<input id="f-ev-date" type="date" /></label>
+        <label>End date (optional)<input id="f-ev-end" type="date" /></label>
+        <label>Type
+          <select id="f-ev-type">
+            <option value="ia">IA</option><option value="exam">SEE / Exam</option>
+            <option value="event">Event</option><option value="deadline">Deadline</option>
+            <option value="holiday">Holiday</option>
+          </select>
+        </label>
+        <label class="wide">Title<input id="f-ev-title" placeholder="IA-3 — DBMS" /></label>
+        <label class="wide">Detail<input id="f-ev-detail" placeholder="Units 1–3, 50 marks" /></label>
+        <label>Venue / time<input id="f-ev-venue" placeholder="Block C, 9:30 AM" /></label>
+        <button class="btn" data-add="event">Add</button>
+      </div>
+    </details>
+
+    <div class="drawer-foot">
+      <button class="btn ghost" id="exportBtn">Export data.js</button>
+      <button class="btn ghost" id="resetBtn">Discard local changes</button>
+    </div>
+    <p class="note" id="adminStatus"></p>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
