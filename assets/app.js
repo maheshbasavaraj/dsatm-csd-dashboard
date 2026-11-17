@@ -87,6 +87,28 @@ function merged() {
   if (Array.isArray(L.research) && L.research.length) data.research = data.research.concat(L.research);
   if (Array.isArray(L.events) && L.events.length) data.events = data.events.concat(L.events);
 
+  /* Excel imports: per-year placement blocks + optional whole-table replacements */
+  if (L.imported) {
+    const imp = L.imported;
+    if (imp.placement) {
+      Object.keys(imp.placement).forEach((ay) => {
+        const incoming = imp.placement[ay] || {};
+        if (!data.academicYears.includes(ay)) data.academicYears.push(ay);
+        data.placement[ay] = Object.assign({}, data.placement[ay] || {}, incoming);
+        if (incoming.recruiters) data.placement[ay].recruiters = incoming.recruiters;
+      });
+      data.academicYears.sort((a, b) => yearFromAy(b) - yearFromAy(a));
+    }
+    if (Array.isArray(imp.research) && imp.research.length) data.research = imp.research.slice();
+    if (Array.isArray(imp.events) && imp.events.length) {
+      const seen = new Set(data.events.map(e => `${e.date}|${e.title}`));
+      imp.events.forEach((e) => {
+        const k = `${e.date}|${e.title}`;
+        if (!seen.has(k)) { data.events.push(e); seen.add(k); }
+      });
+    }
+  }
+
   // Recruiter lists may be partial: keep declared offers authoritative,
   // but never let an empty block show zero.
   Object.keys(data.placement).forEach((ay) => {
@@ -584,10 +606,19 @@ function renderAll() {
   $("#footRight").textContent = `Data updated ${fmtDate(BASE.meta.lastUpdated)} · figures for ${state.year}`;
 }
 
+function buildYearOptions() {
+  const sel = $("#yearSelect");
+  const years = state.data.academicYears;
+  const keep = years.includes(state.year) ? state.year : years[0];
+  sel.innerHTML = "";
+  years.forEach(y => sel.add(new Option(y, y)));
+  state.year = keep;
+  sel.value = keep;
+}
+
 function initShell() {
   const sel = $("#yearSelect");
-  BASE.academicYears.forEach(y => sel.add(new Option(y, y)));
-  sel.value = state.year;
+  buildYearOptions();
   sel.addEventListener("change", () => {
     state.year = sel.value;
     renderAll();
@@ -714,6 +745,11 @@ function initShell() {
     location.reload();
   });
 }
+
+/* exposed for the Excel importer (assets/import.js) */
+window.renderAll = renderAll;
+window.refreshYearOptions = function () { buildYearOptions(); };
+window.dashboardState = state;
 
 initShell();
 renderAll();

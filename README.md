@@ -31,9 +31,11 @@ PDF gives a clean handout), mobile layout, and an **admin drawer** for non-techn
 dept dashboard/
 ├── index.html
 ├── assets/
-│   ├── styles.css     ← look and feel
-│   ├── data.js        ← ALL the numbers live here
-│   └── app.js         ← rendering, charts, admin drawer
+│   ├── styles.css              ← look and feel
+│   ├── data.js                 ← ALL the numbers live here
+│   ├── app.js                  ← rendering, charts, admin drawer
+│   ├── import.js               ← Excel/CSV import + template generator
+│   └── vendor/xlsx.full.min.js ← SheetJS, vendored so it works offline
 └── README.md
 ```
 
@@ -71,10 +73,36 @@ Two routes, both edit the same shape.
 - `iaPlan[]` — the assessment weightage table.
 - `faculty[]` — `name`, `designation`, `area`, `email`, `scholar`, `scopus`.
 
-**2. Admin drawer (✎ in the header)** — add recruiters, publications/patents, or calendar dates
-through a form. Entries save to the browser's localStorage, so they show immediately but only on
-that machine. Press **Export data.js**, then replace `assets/data.js` with the downloaded file to
-publish them. **Discard local changes** wipes the browser overlay.
+**2. Excel / CSV import (fastest for the placement cell)** — header ✎ → *Import from Excel / CSV*:
+
+1. **Download template .xlsx** (four sheets with the exact headers and one example row) and fill it in.
+2. Pick the file. It is parsed **in the browser** — nothing is uploaded anywhere.
+3. Read the preview: how many placement years / recruiter rows / research rows / events were
+   recognised, the parsed numbers, and any row-level warnings.
+4. Leave *add publications to existing list* unchecked to **replace** the research table with the
+   sheet, or check it to append (duplicates matched on year + title).
+5. **Apply to dashboard** — the panels re-render straight away and the year dropdown picks up any
+   new academic year.
+6. **Export data.js** → drop the download into `assets/` to publish the change for everyone.
+
+Sheets are recognised by their **header row**, not their name or order, so you can send one sheet
+or all four, from Excel, LibreOffice or Google Sheets (`File → Download → .xlsx`).
+
+| Sheet | Columns (aliases in brackets) |
+|---|---|
+| Placements | Academic Year, Eligible, Placed, Total Offers, Higher Studies, International, Companies, Average LPA, Median LPA, Highest LPA |
+| Recruiters | Academic Year, Company, Sector, Offers, Role, CTC (LPA) — one row per company |
+| Research | Year, Type (Journal / Conference / Patent / Book chapter / Grant), Title, Faculty (comma separated), Venue, Indexing, Status, DOI |
+| Events *(optional)* | Date, End Date, Type (IA / Exam / Event / Deadline / Holiday), Title, Detail, Venue, Time |
+
+Handled automatically: `2026-27` / `2026-2027` / `2026` / `2026-27` all normalise to the same year;
+`6.5 LPA`, `₹6,50,000`-style cells and Excel date serials are cleaned; `dd-mm-yyyy` and `yyyy-mm-dd`
+both parse; unrecognised sheets and bad rows are reported as warnings instead of failing silently.
+
+**3. Inline forms (✎ in the header)** — add a single recruiter, publication/patent, or calendar date.
+Entries save to the browser's localStorage, so they show immediately but only on that machine.
+Press **Export data.js**, then replace `assets/data.js` to publish. **Discard local changes** wipes
+the browser overlay (imports included).
 
 Keep faculty names character-identical between `faculty[]` and `research[].faculty[]` — the
 per-faculty counts match on the exact string.
@@ -94,6 +122,8 @@ Any static host works; the folder is self-contained.
 3. IA-3 and SEE dates match the latest VTU / college calendar.
 4. Footer shows the intended `lastUpdated` date and no "sample data" chip.
 5. `python -m http.server 8080` → click through all five tabs at desktop **and** phone width.
+6. Excel import: load the template, fill one row per sheet, Apply, confirm the numbers move in the
+   KPIs and the tables, then Export data.js and reload to confirm they persist.
 
 ## Ideas for the next iteration
 
@@ -101,5 +131,5 @@ Any static host works; the folder is self-contained.
 - Placement funnel: registered → eligible → interviewed → placed.
 - MoU / industry-collaboration and funded-project tracker.
 - Per-semester attendance and result pass-percentage widget.
-- CSV import so the placement cell can paste an Excel export instead of editing arrays.
-- Read-only public view + HOD-authenticated edit view backed by a small API.
+- Read-only public view + HOD-authenticated edit view backed by a small API (imports currently
+  publish by replacing `data.js`, which keeps the site static and free to host).

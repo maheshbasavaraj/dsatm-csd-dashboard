@@ -24,6 +24,7 @@
       <span>Academic year</span>
       <select id="yearSelect"></select>
     </label>
+    <button class="pill-btn" id="importBtn" title="Import placements / publications from Excel">⇪ Import Excel</button>
     <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
     <button class="icon-btn" id="adminBtn" title="Admin / edit data" aria-label="Admin">✎</button>
   </div>
@@ -186,6 +187,23 @@
   <p class="note">Changes save to this browser only. Click <b>Export data.js</b> and replace <code>assets/data.js</code> to publish them for everyone.</p>
 
   <div class="drawer-body">
+    <details open class="imp-box">
+      <summary>Import from Excel / CSV</summary>
+      <p class="imp-note">Sheets are recognised by their header row, so names and order are free:
+        <b>Placements</b> (one row per academic year), <b>Recruiters</b>, <b>Research</b>
+        (papers, patents, grants), <b>Events</b>. Parsed in the browser — nothing is uploaded.</p>
+      <div class="imp-controls">
+        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" />
+        <button class="btn ghost" id="templateBtn" type="button">Download template .xlsx</button>
+      </div>
+      <label class="check" style="margin:9px 0">
+        <input type="checkbox" id="importMergeResearch" /> add publications to existing list (unchecked = replace)
+      </label>
+      <div class="imp-preview" id="importPreview"></div>
+      <button class="btn" id="importApply" disabled>Apply to dashboard</button>
+      <p class="note imp-status" id="importStatus">Waiting for a file.</p>
+    </details>
+
     <details open>
       <summary>Add recruiter / offer</summary>
       <div class="form-grid">
@@ -250,7 +268,9 @@
 </aside>
 <div class="scrim" id="scrim"></div>
 
+<script src="assets/vendor/xlsx.full.min.js"></script>
 <script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/import.js"></script>
 </body>
 </html>
