@@ -82,56 +82,79 @@ function ayOf(y, m) {
 const papersAllFor = (ay) => papersFor(ay).filter(r => r.type !== "Patent");
 
 /* ---------------- svg charts ---------------- */
+let gid = 0;
+const grad = (from, to) => {
+  const id = "g" + (++gid);
+  return { id, def: `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient></defs>` };
+};
+
 function donut(value, total, opts = {}) {
   const p = total ? Math.min(1, value / total) : 0;
-  const r = 52, c = 2 * Math.PI * r, size = 132;
-  const color = opts.color || "var(--accent)";
+  const r = 54, c = 2 * Math.PI * r, size = 140;
+  const g = grad("#828fff", "#5e6ad2");
   return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="${esc(opts.label || "")}">
-    <circle cx="66" cy="66" r="${r}" fill="none" stroke="var(--panel2)" stroke-width="13"></circle>
-    <circle cx="66" cy="66" r="${r}" fill="none" stroke="${color}" stroke-width="13" stroke-linecap="round"
-      stroke-dasharray="${(c * p).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 66 66)"></circle>
-    <text x="66" y="62" text-anchor="middle" font-size="26" font-weight="700" fill="var(--fg)">${esc(value)}</text>
-    <text x="66" y="82" text-anchor="middle" font-size="11" fill="var(--dim)">${esc(total ? `of ${total}` : "no denominator")}</text>
+    ${g.def}
+    <circle cx="70" cy="70" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="9"></circle>
+    <circle cx="70" cy="70" r="${r}" fill="none" stroke="url(#${g.id})" stroke-width="9" stroke-linecap="round"
+      stroke-dasharray="${(c * p).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 70 70)"
+      style="filter:drop-shadow(0 0 6px rgba(113,112,255,.45))"></circle>
+    <text x="70" y="66" text-anchor="middle" font-size="27" font-weight="590" fill="var(--fg)"
+      style="font-variant-numeric:tabular-nums;letter-spacing:-.03em">${esc(value)}</text>
+    <text x="70" y="85" text-anchor="middle" font-size="10" fill="var(--dim2)"
+      style="letter-spacing:.08em;text-transform:uppercase">${esc(total ? `of ${total}` : "no denominator")}</text>
   </svg>`;
 }
 
 function hbars(items, opts = {}) {
-  if (!items.length) return `<div class="empty" style="color:var(--dim);font-size:12.5px">No data.</div>`;
-  const W = 560, rowH = 30, padL = opts.padL || 130, padR = 66, padT = 4;
+  if (!items.length) return `<div class="empty" style="color:var(--dim);font-size:12px">No data.</div>`;
+  const W = 560, rowH = 32, padL = opts.padL || 130, padR = 70, padT = 2;
   const H = padT + items.length * rowH;
   const max = Math.max(1, ...items.map(i => i.value));
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  const g = grad(opts.from || "#828fff", opts.to || "#5e6ad2");
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">${g.def}`;
   items.forEach((it, i) => {
     const y = padT + i * rowH;
     const bw = Math.max(it.value ? 4 : 0, (it.value / max) * (W - padL - padR));
-    s += `<text x="${padL - 8}" y="${y + 16}" text-anchor="end" font-size="11.5" fill="var(--dim)">${esc(it.label.length > 22 ? it.label.slice(0, 21) + "…" : it.label)}</text>`;
-    s += `<rect x="${padL}" y="${y + 5}" width="${bw}" height="15" rx="4" fill="${opts.color || "var(--accent)"}" opacity=".9"></rect>`;
     const label = String(it.text != null ? it.text : it.value);
-    if (padL + bw + 8 + label.length * 6 > W - 2) {
-      s += `<text x="${padL + bw - 6}" y="${y + 16}" text-anchor="end" font-size="11" font-weight="600" fill="#fff">${esc(label)}</text>`;
+    s += `<title>${esc(it.label)}: ${esc(label)}</title>`;
+    s += `<text x="${padL - 10}" y="${y + 17}" text-anchor="end" font-size="11" fill="var(--dim)"
+      style="letter-spacing:0">${esc(it.label.length > 22 ? it.label.slice(0, 21) + "…" : it.label)}</text>`;
+    s += `<rect x="${padL}" y="${y + 6}" width="${W - padL - padR}" height="13" rx="6.5" fill="rgba(255,255,255,.035)"></rect>`;
+    s += `<rect x="${padL}" y="${y + 6}" width="${bw}" height="13" rx="6.5" fill="url(#${g.id})"></rect>`;
+    if (padL + bw + 10 + label.length * 6 > W - 2) {
+      s += `<text x="${padL + bw - 8}" y="${y + 16}" text-anchor="end" font-size="10.5" font-weight="590" fill="#fff"
+        style="font-variant-numeric:tabular-nums">${esc(label)}</text>`;
     } else {
-      s += `<text x="${padL + bw + 7}" y="${y + 16}" font-size="11.5" fill="var(--dim)">${esc(label)}</text>`;
+      s += `<text x="${padL + bw + 9}" y="${y + 16}" font-size="10.5" fill="var(--dim)"
+        style="font-variant-numeric:tabular-nums">${esc(label)}</text>`;
     }
   });
   return s + "</svg>";
 }
 
 function vbars(months, opts = {}) {
-  const W = 560, H = 190, padL = 26, padB = 26, padT = 10;
+  const W = 560, H = 180, padL = 8, padB = 24, padT = 14;
   const max = Math.max(1, ...months.map(m => m.n));
-  const plotW = W - padL - 8, plotH = H - padT - padB;
-  const step = plotW / months.length, bw = Math.min(34, step * 0.6);
-  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  const plotW = W - padL - 4, plotH = H - padT - padB;
+  const step = plotW / months.length, bw = Math.min(30, step * 0.52);
+  const g = grad(opts.from || "#2dd4bf", opts.to || "#0f766e");
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">${g.def}`;
   [0.5, 1].forEach(f => {
     const y = padT + plotH - plotH * f;
-    s += `<line x1="${padL}" y1="${y}" x2="${W - 8}" y2="${y}" stroke="var(--line)" stroke-dasharray="3 4"></line>`;
+    s += `<line x1="${padL}" y1="${y}" x2="${W - 4}" y2="${y}" stroke="rgba(255,255,255,.06)" stroke-dasharray="2 5"></line>`;
   });
   months.forEach((m, i) => {
     const h = (m.n / max) * plotH;
     const x = padL + step * i + (step - bw) / 2;
-    s += `<rect x="${x}" y="${padT + plotH - h}" width="${bw}" height="${Math.max(m.n ? 3 : 0, h)}" rx="4" fill="${opts.color || "var(--accent2)"}" opacity=".9"></rect>`;
-    if (m.n) s += `<text x="${x + bw / 2}" y="${padT + plotH - h - 5}" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--fg)">${m.n}</text>`;
-    s += `<text x="${x + bw / 2}" y="${H - 8}" text-anchor="middle" font-size="10" fill="var(--dim)">${esc(m.label)}</text>`;
+    s += `<title>${esc(m.label)}: ${m.n}</title>`;
+    if (m.n) {
+      s += `<rect x="${x}" y="${padT + plotH - h}" width="${bw}" height="${Math.max(3, h)}" rx="4" fill="url(#${g.id})"></rect>`;
+      s += `<text x="${x + bw / 2}" y="${padT + plotH - h - 6}" text-anchor="middle" font-size="10" font-weight="590"
+        fill="var(--fg2)" style="font-variant-numeric:tabular-nums">${m.n}</text>`;
+    }
+    s += `<text x="${x + bw / 2}" y="${H - 7}" text-anchor="middle" font-size="9.5" fill="var(--dim2)"
+      style="letter-spacing:.04em">${esc(m.label)}</text>`;
   });
   return s + "</svg>";
 }
@@ -217,12 +240,23 @@ function renderOverview() {
   const o = overallStats();
   const pat = patentCount(state.year);
   const pubs = papersAllFor(state.year).length;
-  const planOpen = D.plan.items.filter(i => i.status !== "Completed").length;
+
   $("#kpis").innerHTML = `
+    ${kpi("Publications", pubs, `${pat} patents this year · ${o.papers} papers all cycles`, "a2")}
     ${kpi("Students placed", `${s.placed}`, `of ${s.eligible ? num(s.eligible) : "—"} eligible · ${o.placed} across all cycles`, "")}
-    ${kpi("Placement rate", s.rate == null ? "—" : s.rate, s.rate == null ? "no eligible count in source" : "% of eligible batch", "a2", s.rate == null ? "" : "%")}
-    ${kpi("Highest package", s.highest == null ? "—" : s.highest.toFixed(1), `average ${s.avgCtc ? s.avgCtc.toFixed(1) : "—"} LPA · ${o.offers} offers all cycles`, "", "LPA")}
-    ${kpi("Publications", pubs, `${pat} patents this year · ${o.papers} papers all cycles`, "a2")}`;
+    ${kpi("Placement rate", s.rate == null ? "—" : s.rate, s.rate == null ? "no eligible count in source" : "% of eligible batch", "a3", s.rate == null ? "" : "%")}
+    ${kpi("Highest package", s.highest == null ? "—" : s.highest.toFixed(2), `average ${s.avgCtc ? s.avgCtc.toFixed(2) : "—"} LPA · ${o.offers} offers all cycles`, "", "LPA")}`;
+
+  $("#ovPubYear").textContent = state.year;
+  const months = MONTHS.map((m, i) => ({ label: m, n: papersAllFor(state.year).filter(r => r.month === i + 1).length }));
+  $("#pubMonths").innerHTML = vbars(months);
+
+  const perFac = {};
+  papersFor(state.year).forEach(r => (r.faculty || []).forEach(n => { perFac[n] = (perFac[n] || 0) + 1; }));
+  $("#ovFacPubs").innerHTML = hbars(
+    Object.entries(perFac).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([n, v]) => ({ label: n, value: v, text: `${v}` })),
+    { padL: 150, from: "#34d399", to: "#0f766e" }
+  );
 
   $("#donutPlacement").innerHTML = donut(s.placed, s.eligible, { label: "placed" });
   $("#progHint").textContent = s.rate == null ? "eligible count pending" : `${s.rate}% placed`;
@@ -232,16 +266,7 @@ function renderOverview() {
     ["Median CTC", s.medianCtc ? s.medianCtc.toFixed(2) + " LPA" : "—"]
   ].map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join("");
 
-  $("#bandMini").innerHTML = hbars(s.bands.map(b => ({ label: b.label, value: b.n, text: `${b.n}` })), { color: "var(--accent)", padL: 92 });
-
-  const months = MONTHS.map((m, i) => ({ label: m, n: papersAllFor(state.year).filter(r => r.month === i + 1).length }));
-  $("#pubMonths").innerHTML = vbars(months);
-
-  $("#planMini").innerHTML = D.plan.items.slice(0, 4).map(i => `
-    <div class="mi">
-      <div class="mi-top"><span>${esc(i.title)}</span><b>${Number(i.progress || 0)}%</b></div>
-      <div class="bar"><i style="width:${Math.min(100, Number(i.progress || 0))}%"></i></div>
-    </div>`).join("");
+  $("#bandMini").innerHTML = hbars(s.bands.map(b => ({ label: b.label, value: b.n, text: `${b.n}` })), { padL: 92 });
 
   yearTable("#yearTableOverview");
 }

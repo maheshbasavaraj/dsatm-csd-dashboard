@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#08090a" />
 <title>DSATM · CSE (Data Science) — Department Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;510;590&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
@@ -39,7 +43,6 @@
 <nav class="tabs" id="tabs" role="tablist">
   <button class="tab active" data-tab="overview">Overview</button>
   <button class="tab" data-tab="placements">Placements</button>
-  <button class="tab" data-tab="plan">Placement plan</button>
   <button class="tab" data-tab="research">Research</button>
   <button class="tab" data-tab="faculty">Faculty</button>
 </nav>
@@ -48,6 +51,20 @@
   <!-- OVERVIEW -->
   <section class="panel active" id="p-overview">
     <div class="kpis" id="kpis"></div>
+
+    <!-- research first -->
+    <div class="grid c2">
+      <article class="card">
+        <div class="card-head"><h2>Publications by month</h2><span class="hint">Scopus / WoS · <span id="ovPubYear"></span></span></div>
+        <div id="pubMonths" class="viz"></div>
+      </article>
+      <article class="card">
+        <div class="card-head"><h2>Papers by faculty</h2><span class="hint">this academic year</span></div>
+        <div id="ovFacPubs" class="viz"></div>
+      </article>
+    </div>
+
+    <!-- then placements -->
     <div class="grid c2">
       <article class="card">
         <div class="card-head"><h2>Placement progress</h2><span class="hint" id="progHint"></span></div>
@@ -61,16 +78,7 @@
         <div id="bandMini" class="viz"></div>
       </article>
     </div>
-    <div class="grid c2">
-      <article class="card">
-        <div class="card-head"><h2>Publications by month</h2><span class="hint">Scopus / WoS</span></div>
-        <div id="pubMonths" class="viz"></div>
-      </article>
-      <article class="card">
-        <div class="card-head"><h2>Placement plan at a glance</h2><span class="hint">open the plan tab for detail</span></div>
-        <div id="planMini" class="mini-list"></div>
-      </article>
-    </div>
+
     <article class="card">
       <div class="card-head"><h2>Year-wise numbers</h2><span class="hint">placed · offers · companies · CTC</span></div>
       <div class="table-wrap" id="yearTableOverview"></div>
@@ -108,11 +116,9 @@
       <div class="card-head"><h2>Offer list</h2><span class="hint">every row from the placement sheet</span></div>
       <ul class="rows" id="offerList"></ul>
     </article>
-  </section>
 
-  <!-- PLAN -->
-  <section class="panel" id="p-plan">
-    <div class="section-head">
+    <!-- placement plan now lives inside the placements tab -->
+    <div class="section-head" style="margin-top:22px">
       <h2>Placement plan · <span id="planYear"></span></h2>
       <button class="ghost admin-only" data-add="planItem">+ Add plan item</button>
     </div>

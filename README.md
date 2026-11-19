@@ -8,13 +8,18 @@ Every admin (✎) field is editable in the browser; no server needed.
 
 ## Tabs
 
+Four tabs. Overview leads with research, then placements — the order the department reports in.
+
 | Tab | What is on it |
 |---|---|
-| **Overview** | 4 KPI tiles (placed, rate, highest package, publications), placement donut, package-band bars, publications-by-month bars, plan progress, year-wise numbers table |
-| **Placements** | this-year chips + all-cycles chips, placed-vs-eligible donut, package bands, top recruiters bars, all-cycles table, full offer list (editable) |
-| **Placement plan** | targets vs today as progress bars, 5 plan cards: aptitude training, weekly 1-hour LeetCode session, 2 planned hackathons, advanced database workshop (5th sem ongoing), advanced database workshop (7th sem completed) |
-| **Research** | year chips, papers-per-faculty bars, journal-vs-conference donut, year-wise output table (papers / patents / Q1 / Q2), listed publications |
+| **Overview** | 4 KPI tiles (publications, placed, rate, highest package) · **Publications first**: papers-by-month bars + papers-by-faculty bars · **then placement**: placed-vs-eligible donut + package-band bars · year-wise numbers table |
+| **Placements** | this-year chips + all-cycles chips, placed donut, package bands, top recruiters, all-cycles table, offer list, **and the placement plan** (targets vs today + 5 plan cards) at the bottom of the same tab |
+| **Research** | year chips, papers-per-faculty bars, journal-vs-conference donut, year-wise output table (papers/patents/Q1/Q2), listed publications |
 | **Faculty** | summary chips (teaching faculty, doctorates, papers, patents), cards with qualification, area, paper/patent counts, h-index |
+
+**Placement plan cards:** aptitude training (weekly) · LeetCode session (1 hour every week) ·
+2 hackathons planned · advanced database workshop, 5th sem ongoing · advanced database workshop,
+7th sem completed.
 
 ## Admin — create, edit, delete on every tab
 
