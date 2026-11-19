@@ -92,7 +92,7 @@ const grad = (from, to) => {
 function donut(value, total, opts = {}) {
   const p = total ? Math.min(1, value / total) : 0;
   const r = 54, c = 2 * Math.PI * r, size = 140;
-  const g = grad("#828fff", "#5e6ad2");
+  const g = grad(opts.from || "#a5b4fc", opts.to || "#22d3ee");
   return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="${esc(opts.label || "")}">
     ${g.def}
     <circle cx="70" cy="70" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="9"></circle>
@@ -121,7 +121,7 @@ function hbars(items, opts = {}) {
     s += `<text x="${padL - 10}" y="${y + 17}" text-anchor="end" font-size="11" fill="var(--dim)"
       style="letter-spacing:0">${esc(it.label.length > 22 ? it.label.slice(0, 21) + "…" : it.label)}</text>`;
     s += `<rect x="${padL}" y="${y + 6}" width="${W - padL - padR}" height="13" rx="6.5" fill="rgba(255,255,255,.035)"></rect>`;
-    s += `<rect x="${padL}" y="${y + 6}" width="${bw}" height="13" rx="6.5" fill="url(#${g.id})"></rect>`;
+    s += `<rect x="${padL}" y="${y + 6}" width="${bw}" height="13" rx="6.5" fill="${it.color || "url(#${g.id})"}"></rect>`;
     if (padL + bw + 10 + label.length * 6 > W - 2) {
       s += `<text x="${padL + bw - 8}" y="${y + 16}" text-anchor="end" font-size="10.5" font-weight="590" fill="#fff"
         style="font-variant-numeric:tabular-nums">${esc(label)}</text>`;
@@ -138,7 +138,7 @@ function vbars(months, opts = {}) {
   const max = Math.max(1, ...months.map(m => m.n));
   const plotW = W - padL - 4, plotH = H - padT - padB;
   const step = plotW / months.length, bw = Math.min(30, step * 0.52);
-  const g = grad(opts.from || "#2dd4bf", opts.to || "#0f766e");
+  const g = grad(opts.from || "#67e8f9", opts.to || "#6366f1");
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img">${g.def}`;
   [0.5, 1].forEach(f => {
     const y = padT + plotH - plotH * f;
@@ -200,6 +200,9 @@ function patentCount(ay) {
   return typeof p === "number" ? p : (p.total || 0);
 }
 
+const BAND_COLORS = { "≥ 15 LPA": "#34d399", "10–15": "#a3e635", "8–10": "#22d3ee", "6–8": "#818cf8", "4–6": "#fbbf24", "< 4": "#fb7185" };
+const bandItem = (b, extra) => ({ label: b.label, value: b.n, text: extra || String(b.n), color: BAND_COLORS[b.label] });
+
 function overallStats() {
   const all = D.years.flatMap(ay => (D.placement[ay].offers || []));
   const bestByStudent = new Map();
@@ -242,10 +245,10 @@ function renderOverview() {
   const pubs = papersAllFor(state.year).length;
 
   $("#kpis").innerHTML = `
-    ${kpi("Publications", pubs, `${pat} patents this year · ${o.papers} papers all cycles`, "a2")}
-    ${kpi("Students placed", `${s.placed}`, `of ${s.eligible ? num(s.eligible) : "—"} eligible · ${o.placed} across all cycles`, "")}
-    ${kpi("Placement rate", s.rate == null ? "—" : s.rate, s.rate == null ? "no eligible count in source" : "% of eligible batch", "a3", s.rate == null ? "" : "%")}
-    ${kpi("Highest package", s.highest == null ? "—" : s.highest.toFixed(2), `average ${s.avgCtc ? s.avgCtc.toFixed(2) : "—"} LPA · ${o.offers} offers all cycles`, "", "LPA")}`;
+    ${kpi("Publications", pubs, `${pat} patents this year · ${o.papers} papers all cycles`, "t-emerald")}
+    ${kpi("Students placed", `${s.placed}`, `of ${s.eligible ? num(s.eligible) : "—"} eligible · ${o.placed} across all cycles`, "t-violet")}
+    ${kpi("Placement rate", s.rate == null ? "—" : s.rate, s.rate == null ? "no eligible count in source" : "% of eligible batch", "t-cyan", s.rate == null ? "" : "%")}
+    ${kpi("Highest package", s.highest == null ? "—" : s.highest.toFixed(2), `average ${s.avgCtc ? s.avgCtc.toFixed(2) : "—"} LPA · ${o.offers} offers all cycles`, "t-rose", "LPA")}`;
 
   $("#ovPubYear").textContent = state.year;
   const months = MONTHS.map((m, i) => ({ label: m, n: papersAllFor(state.year).filter(r => r.month === i + 1).length }));
@@ -255,10 +258,10 @@ function renderOverview() {
   papersFor(state.year).forEach(r => (r.faculty || []).forEach(n => { perFac[n] = (perFac[n] || 0) + 1; }));
   $("#ovFacPubs").innerHTML = hbars(
     Object.entries(perFac).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([n, v]) => ({ label: n, value: v, text: `${v}` })),
-    { padL: 150, from: "#34d399", to: "#0f766e" }
+    { padL: 150, from: "#f472b6", to: "#8b5cf6" }
   );
 
-  $("#donutPlacement").innerHTML = donut(s.placed, s.eligible, { label: "placed" });
+  $("#donutPlacement").innerHTML = donut(s.placed, s.eligible, { label: "placed", from: "#a5b4fc", to: "#22d3ee" });
   $("#progHint").textContent = s.rate == null ? "eligible count pending" : `${s.rate}% placed`;
   $("#placementMini").innerHTML = [
     ["Offers", num(s.offers)], ["Companies", num(s.companies)],
@@ -266,7 +269,7 @@ function renderOverview() {
     ["Median CTC", s.medianCtc ? s.medianCtc.toFixed(2) + " LPA" : "—"]
   ].map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join("");
 
-  $("#bandMini").innerHTML = hbars(s.bands.map(b => ({ label: b.label, value: b.n, text: `${b.n}` })), { padL: 92 });
+  $("#bandMini").innerHTML = hbars(s.bands.map(b => bandItem(b)), { padL: 92 });
 
   yearTable("#yearTableOverview");
 }
@@ -294,7 +297,7 @@ function renderPlacements() {
     ["Best package on record", o.highest ? o.highest.toFixed(2) + " LPA" : "—"]
   ].map(([k, v]) => `<span class="chip">${esc(k)} <b>${esc(v)}</b></span>`).join("");
   yearTable("#yearTablePlacements");
-  $("#donutPlacements").innerHTML = donut(s.placed, s.eligible, { label: "placed" });
+  $("#donutPlacements").innerHTML = donut(s.placed, s.eligible, { label: "placed", from: "#a5b4fc", to: "#22d3ee" });
   $("#placeMini").innerHTML = [
     ["Students with an offer", s.placed],
     ["Total offers", s.offers],
@@ -302,9 +305,9 @@ function renderPlacements() {
     ["Recruiters", s.companies]
   ].map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join("");
 
-  $("#bandFull").innerHTML = hbars(s.bands.map(b => ({ label: b.label, value: b.n, text: `${b.n} (${pct(b.n, s.offers) || 0}%)` })), { color: "var(--accent)", padL: 92 });
+  $("#bandFull").innerHTML = hbars(s.bands.map(b => bandItem(b, `${b.n} (${pct(b.n, s.offers) || 0}%)`)), { padL: 92 });
   $("#recHint").textContent = `${s.companies} companies · ${s.offers} offers`;
-  $("#companies").innerHTML = hbars(s.companyList.slice(0, 8).map(([n, v]) => ({ label: n, value: v.offers, text: `${v.offers} · ${v.best.toFixed(2)} LPA` })), { color: "var(--accent2)", padL: 140 });
+  $("#companies").innerHTML = hbars(s.companyList.slice(0, 8).map(([n, v]) => ({ label: n, value: v.offers, text: `${v.offers} · ${v.best.toFixed(2)} LPA` })), { padL: 140, from: "#38bdf8", to: "#0ea5e9" });
 
   $("#offerList").innerHTML = (D.placement[state.year].offers || []).map((o, i) => `
     <li>
@@ -363,10 +366,10 @@ function renderResearch() {
 
   const perFac = {};
   list.forEach(r => (r.faculty || []).forEach(n => { perFac[n] = (perFac[n] || 0) + 1; }));
-  $("#facPubs").innerHTML = hbars(Object.entries(perFac).sort((a, b) => b[1] - a[1]).map(([n, v]) => ({ label: n, value: v, text: `${v}` })), { color: "var(--accent2)", padL: 150 });
+  $("#facPubs").innerHTML = hbars(Object.entries(perFac).sort((a, b) => b[1] - a[1]).map(([n, v]) => ({ label: n, value: v, text: `${v}` })), { padL: 150, from: "#34d399", to: "#22d3ee" });
 
   const j = list.filter(r => r.type === "Journal").length, c = list.filter(r => r.type === "Conference").length;
-  $("#typeDonut").innerHTML = donut(j, j + c, { color: "var(--accent2)" });
+  $("#typeDonut").innerHTML = donut(j, j + c, { from: "#34d399", to: "#0ea5e9" });
   $("#typeMini").innerHTML = `<div><span>Journals</span><b>${j}</b></div><div><span>Conferences</span><b>${c}</b></div>
     <div><span>With DOI</span><b>${list.filter(r => r.doi).length}</b></div>`;
 
