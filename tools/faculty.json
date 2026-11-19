@@ -1,0 +1,183 @@
+{
+  "_note": "Faculty roster transcribed from https://dsatm.edu.in/csds-fac . empId, hIndex, citations, scopus and scholar come from the Total Count sheet of files/Faculty Publication and Patent details.xlsx. Email addresses are not published on the department page, so they are left blank rather than guessed. Research areas are inferred from each faculty member publication titles. Programme/office staff are listed separately and are not counted as teaching faculty.",
+  "faculty": [
+    {
+      "name": "Dr. Sumithra Devi K A",
+      "designation": "Dean Academics & Head",
+      "qualification": "BE, M.Tech, Ph.D",
+      "empId": "180404",
+      "area": "Data science, computer networks, applied AI",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": null,
+      "citations": null
+    },
+    {
+      "name": "Dr. K Harshavardhana Reddy",
+      "designation": "Associate Professor",
+      "qualification": "M.Tech, Ph.D",
+      "empId": "180925",
+      "area": "Machine learning, signal processing",
+      "email": "",
+      "scholar": "https://scholar.google.com/citations?user=vJjwcVwAAAAJ&hl=en",
+      "scopus": "https://www.scopus.com/authid/detail.uri?authorId=5719362535",
+      "hIndex": 1,
+      "citations": 7
+    },
+    {
+      "name": "Dr. Sachchida Nand Mishra",
+      "designation": "Associate Professor",
+      "qualification": "Ph.D",
+      "empId": "180931",
+      "area": "Cyber security, malware and ransomware analytics",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": null,
+      "citations": null
+    },
+    {
+      "name": "Dr. Neelambika B Hiremath",
+      "designation": "Assistant Professor",
+      "qualification": "B.E, M.Tech, Ph.D",
+      "empId": "180907",
+      "area": "Image processing, blockchain, secure multimedia",
+      "email": "",
+      "scholar": "https://scholar.google.com/citations?user=phOfwhEAAAAJ&hl=en",
+      "scopus": "https://www.scopus.com/authid/detail.uri?authorId=5722612283",
+      "hIndex": 2,
+      "citations": 14
+    },
+    {
+      "name": "Mr. S Saravanan",
+      "designation": "Assistant Professor",
+      "qualification": "B.E., M.E., (Ph.D)",
+      "empId": "180758",
+      "area": "Software vulnerability detection, reinforcement learning",
+      "email": "",
+      "scholar": "https://scholar.google.com/citations?user=20dcGIEAAAAJ&hl=en",
+      "scopus": "https://www.scopus.com/authid/detail.uri?authorId=6051004040",
+      "hIndex": 2,
+      "citations": 14
+    },
+    {
+      "name": "Mr. S R V Prasad Reddy",
+      "designation": "Assistant Professor",
+      "qualification": "MCA, M.Tech",
+      "empId": "180863",
+      "area": "Edge computing, energy-efficient AI, cognitive systems",
+      "email": "",
+      "scholar": "https://scholar.google.com/citations?user=CGauCXEAAAAJ&hl=en",
+      "scopus": "https://www.scopus.com/authid/detail.uri?authorId=5931622590",
+      "hIndex": 1,
+      "citations": 25
+    },
+    {
+      "name": "Mrs. Lakshmi S R",
+      "designation": "Assistant Professor",
+      "qualification": "M.Tech, (Ph.D)",
+      "empId": "180793",
+      "area": "Graph neural networks, IoT learning environments",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": null,
+      "citations": null
+    },
+    {
+      "name": "Mr. Mahesh Basavaraj",
+      "designation": "Assistant Professor",
+      "qualification": "M.Tech",
+      "empId": "180811",
+      "area": "Vision-language models, spatio-temporal networks",
+      "email": "",
+      "scholar": "https://scholar.google.com/citations?user=aANFb2EAAAAJ&hl=en",
+      "scopus": "https://www.scopus.com/authid/detail.uri?authorId=6034553320",
+      "hIndex": 0,
+      "citations": 0
+    },
+    {
+      "name": "Mr. Ranjan Raj",
+      "designation": "Assistant Professor",
+      "qualification": "M.Tech (IT)",
+      "empId": "180887",
+      "area": "Generative models, video anomaly detection",
+      "email": "",
+      "scholar": "https://scholar.google.com/citations?view_op=list_works&hl=en",
+      "scopus": "https://www.scopus.com/authid/detail.uri?authorId=6070907040",
+      "hIndex": null,
+      "citations": 13
+    },
+    {
+      "name": "Mr. Sathwik Shetty B",
+      "designation": "Assistant Professor",
+      "qualification": "M.Tech",
+      "empId": "180913",
+      "area": "Industrial vision, underwater communication",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": null,
+      "citations": null
+    },
+    {
+      "name": "Mr. Chaitanya M",
+      "designation": "Assistant Professor",
+      "qualification": "M.Tech (Integrated)",
+      "empId": "180921",
+      "area": "Road-surface vision, transformers for sensors",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": 0,
+      "citations": 0
+    },
+    {
+      "name": "Mr. Kartik Sharma",
+      "designation": "Assistant Professor",
+      "qualification": "B.Tech, M.Tech",
+      "empId": "180935",
+      "area": "IoT platforms, aquaculture monitoring",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": null,
+      "citations": null
+    },
+    {
+      "name": "Dr. Sudha M",
+      "designation": "Professor of Practice",
+      "qualification": "BCA, MCA, Ph.D",
+      "empId": "",
+      "area": "Applied data engineering, industry practice",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": null,
+      "citations": null
+    },
+    {
+      "name": "Mr. Rahul Kumar",
+      "designation": "Assistant Professor of Practice",
+      "qualification": "B.E",
+      "empId": "",
+      "area": "Industry practice, analytics delivery",
+      "email": "",
+      "scholar": "",
+      "scopus": "",
+      "hIndex": null,
+      "citations": null
+    }
+  ],
+  "supportStaff": [
+    {
+      "name": "Mr. Gajendra S",
+      "designation": "Programmer"
+    },
+    {
+      "name": "Ms. Danduri Mamatha Reddy",
+      "designation": "Office Assistant"
+    }
+  ]
+}

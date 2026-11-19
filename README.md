@@ -1,135 +1,68 @@
 # Department Dashboard — DSATM CSE (Data Science)
 
-A single-page, zero-dependency department dashboard for **CSE (Data Science), DSATM**.
-Covers placements, research output (papers / patents / grants), the department calendar
-(IA, SEE, events, deadlines) and the faculty directory.
+Visual-first department dashboard: placements, placement plan, research and faculty.
+Charts and numbers first, tables only where a count needs a year-by-year breakdown.
+Every admin (✎) field is editable in the browser; no server needed.
 
-Runs from a plain folder — no server, no build step, no internet needed. Open
-`index.html` and it works. Numbers are plain JavaScript objects in one file.
+**Live:** https://maheshbasavaraj.github.io/dsatm-csd-dashboard/
 
-> **The shipped figures are sample data** so the layout can be judged. Replace them with the
-> department's real numbers before circulating the link (see *Updating data*).
+## Tabs
 
----
-
-## What is on it
-
-| Panel | What it answers |
+| Tab | What is on it |
 |---|---|
-| **Overview** | Headline KPIs (placed, rate, highest package, papers, patents), placement trend across 4 cycles, next 5 department dates, research output mix, derived headline numbers |
-| **Placements** | Eligible / placed / offers / recruiters / average / highest / higher studies / international, CTC-band and sector charts, full recruiter table, year-on-year comparison |
-| **Research** | Journals, conferences, patents, book chapters, grants — searchable and filterable by type / faculty / year, with DOI links, plus output-per-year and faculty-wise charts |
-| **Calendar** | Upcoming IA / SEE / events / deadlines with countdowns, month grouping, past dates dimmed, IA weightage plan, odd/even semester map |
-| **Faculty** | Directory cards with specialisation, live paper/patent/grant counts and Scholar/Scopus/email links |
+| **Overview** | 4 KPI tiles (placed, rate, highest package, publications), placement donut, package-band bars, publications-by-month bars, plan progress, year-wise numbers table |
+| **Placements** | this-year chips + all-cycles chips, placed-vs-eligible donut, package bands, top recruiters bars, all-cycles table, full offer list (editable) |
+| **Placement plan** | targets vs today as progress bars, 5 plan cards: aptitude training, weekly 1-hour LeetCode session, 2 planned hackathons, advanced database workshop (5th sem ongoing), advanced database workshop (7th sem completed) |
+| **Research** | year chips, papers-per-faculty bars, journal-vs-conference donut, year-wise output table (papers / patents / Q1 / Q2), listed publications |
+| **Faculty** | summary chips (teaching faculty, doctorates, papers, patents), cards with qualification, area, paper/patent counts, h-index |
 
-Extras: academic-year switcher, dark / light theme, print stylesheet (browser → Print →
-PDF gives a clean handout), mobile layout, and an **admin drawer** for non-technical updates.
+## Admin — create, edit, delete on every tab
 
-## File layout
+Click **✎ Admin** in the header. Then:
 
-```
-dept dashboard/
-├── index.html
-├── assets/
-│   ├── styles.css              ← look and feel
-│   ├── data.js                 ← ALL the numbers live here
-│   ├── app.js                  ← rendering, charts, admin drawer
-│   ├── import.js               ← Excel/CSV import + template generator
-│   └── vendor/xlsx.full.min.js ← SheetJS, vendored so it works offline
-└── README.md
-```
+- **+ Add offer** (Placements), **+ Add plan item** (Placement plan), **+ Add publication** (Research), **+ Add faculty** (Faculty).
+- Every list row, plan card and faculty card gets **✎ edit** and **🗑 delete**.
+- Changes apply instantly to charts and numbers, and are stored in this browser (localStorage) so they survive a reload.
+- **Export data.js** downloads the edited dataset with a fresh `lastUpdated` date. Replace `assets/data.js` with it to publish for everyone.
+- **Reset changes** discards local edits.
 
-## Running it
+Editable fields: offer (student, company, CTC) · publication (title, faculty, type, venue, year, month, quartile, DOI) · faculty (name, designation, qualification, area, h-index) · plan item (title, detail, status, schedule, progress %).
+
+## Source data
+
+| Source | Feeds |
+|---|---|
+| `files/PLACEMENT ANALYSIS.xlsx` (2022 & 2023 batch lists) | placements — every offer, company, CTC |
+| `files/Faculty Publication and Patent details.xlsx` | research list + patent counts + h-index |
+| `files/2023 batch student details.xlsx` | eligible strength (68) for 2026-27 |
+| `https://dsatm.edu.in/csds-fac` (`tools/faculty.json`) | faculty roster |
 
 ```bash
-# simplest: double-click index.html
-
-# or serve it (needed if you later add fetch-based data)
-python -m http.server 8080
-# then open http://127.0.0.1:8080
+node tools/build-data.js     # regenerates assets/data.js from files/ + tools/
 ```
 
-## Updating data
+Batch mapping: 2022 batch → AY 2025-26, 2023 batch → AY 2026-27.
 
-Two routes, both edit the same shape.
+## What the numbers are
 
-**1. Direct edit (recommended for bulk changes)** — open `assets/data.js`:
+- 2026-27: 9 students placed, 12 offers, 3 companies, 68 eligible (13.2%), average 4.85 LPA, highest 8 LPA.
+- 2025-26: 27 students placed, 32 offers, 21 companies, average 5.21 LPA, highest 10 LPA. Eligible strength is **not** in the source files, so the rate shows "—" rather than a guess.
+- All cycles: 35 students placed, 44 offers, 23 recruiters, best package 10 LPA.
+- Research: 67 listed papers/conference publications (45 in 2025-26, 22 in 2026-27 so far), 14 + 7 patents reported by faculty, 14 teaching faculty.
+- Patent titles are not in the workbook — only counts.
+- Students are de-duplicated by USN (the 2023 sheet lists one student twice under different name spellings).
 
-- `meta` — college name, HOD, e-mail, `lastUpdated`, and `activeYear` (the year shown on load).
-  Set `meta.sample = false` once real data is in; that removes the "sample data" footer chip.
-- `academicYears` — most recent first. Each entry needs a matching block under `placement`.
-- `placement["2026-27"]` — `eligible`, `placed`, `offers`, `higherStudies`, `companies`,
-  `highestLpa`, `averageLpa`, `medianLpa`, `international`, and `recruiters[]` rows
-  (`name`, `sector`, `offers`, `role`, `ctc`). The recruiter list may be partial: the declared
-  `offers` count is used as the denominator for all share percentages, and the table header
-  states "N of M offers listed".
-- `research[]` — one row per output: `year`, `type` (`Journal` | `Conference` | `Patent` |
-  `Book chapter` | `Grant`), `title`, `faculty[]`, `venue`, `indexing`
-  (`SCI` / `Scopus` / `UGC-CARE` / `Granted` / `Published`), `status`, `doi`.
-  Faculty-wise counts and every chart derive from this array — add the row once.
-- `events[]` — `date` (YYYY-MM-DD), optional `endDate`, `type`
-  (`ia` | `exam` | `event` | `deadline` | `holiday`), `title`, `detail`, `venue`.
-  Past dates are dimmed automatically; the semester map and countdowns come from these dates.
-- `iaPlan[]` — the assessment weightage table.
-- `faculty[]` — `name`, `designation`, `area`, `email`, `scholar`, `scopus`.
+## Files
 
-**2. Excel / CSV import (fastest for the placement cell)** — header ✎ → *Import from Excel / CSV*:
+```
+index.html            layout shell
+assets/styles.css     theme, cards, charts, dialog
+assets/app.js         charts, renders, admin CRUD
+assets/data.js        GENERATED data (do not hand-edit)
+tools/build-data.js   workbook → data.js
+tools/faculty.json    faculty roster
+files/                source spreadsheets (student-level, keep local)
+assets/import.js      legacy Excel importer, no longer wired into the page
+```
 
-1. **Download template .xlsx** (four sheets with the exact headers and one example row) and fill it in.
-2. Pick the file. It is parsed **in the browser** — nothing is uploaded anywhere.
-3. Read the preview: how many placement years / recruiter rows / research rows / events were
-   recognised, the parsed numbers, and any row-level warnings.
-4. Leave *add publications to existing list* unchecked to **replace** the research table with the
-   sheet, or check it to append (duplicates matched on year + title).
-5. **Apply to dashboard** — the panels re-render straight away and the year dropdown picks up any
-   new academic year.
-6. **Export data.js** → drop the download into `assets/` to publish the change for everyone.
-
-Sheets are recognised by their **header row**, not their name or order, so you can send one sheet
-or all four, from Excel, LibreOffice or Google Sheets (`File → Download → .xlsx`).
-
-| Sheet | Columns (aliases in brackets) |
-|---|---|
-| Placements | Academic Year, Eligible, Placed, Total Offers, Higher Studies, International, Companies, Average LPA, Median LPA, Highest LPA |
-| Recruiters | Academic Year, Company, Sector, Offers, Role, CTC (LPA) — one row per company |
-| Research | Year, Type (Journal / Conference / Patent / Book chapter / Grant), Title, Faculty (comma separated), Venue, Indexing, Status, DOI |
-| Events *(optional)* | Date, End Date, Type (IA / Exam / Event / Deadline / Holiday), Title, Detail, Venue, Time |
-
-Handled automatically: `2026-27` / `2026-2027` / `2026` / `2026-27` all normalise to the same year;
-`6.5 LPA`, `₹6,50,000`-style cells and Excel date serials are cleaned; `dd-mm-yyyy` and `yyyy-mm-dd`
-both parse; unrecognised sheets and bad rows are reported as warnings instead of failing silently.
-
-**3. Inline forms (✎ in the header)** — add a single recruiter, publication/patent, or calendar date.
-Entries save to the browser's localStorage, so they show immediately but only on that machine.
-Press **Export data.js**, then replace `assets/data.js` to publish. **Discard local changes** wipes
-the browser overlay (imports included).
-
-Keep faculty names character-identical between `faculty[]` and `research[].faculty[]` — the
-per-faculty counts match on the exact string.
-
-## Publishing
-
-Any static host works; the folder is self-contained.
-
-- **GitHub Pages** — push, then Settings → Pages → deploy from `main` / root.
-- **College intranet** — copy the folder to the web root.
-- **Render / Netlify / Vercel** — static site, no build command.
-
-## Verification checklist before sharing
-
-1. Placement rate = placed ÷ eligible, and declared offers ≥ offers in the recruiter table.
-2. Every journal/patent/grant row appears once in `research[]` (faculty counts feed off it).
-3. IA-3 and SEE dates match the latest VTU / college calendar.
-4. Footer shows the intended `lastUpdated` date and no "sample data" chip.
-5. `python -m http.server 8080` → click through all five tabs at desktop **and** phone width.
-6. Excel import: load the template, fill one row per sheet, Apply, confirm the numbers move in the
-   KPIs and the tables, then Export data.js and reload to confirm they persist.
-
-## Ideas for the next iteration
-
-- Student achievements strip (hackathon wins, GATE/CAT results, internships).
-- Placement funnel: registered → eligible → interviewed → placed.
-- MoU / industry-collaboration and funded-project tracker.
-- Per-semester attendance and result pass-percentage widget.
-- Read-only public view + HOD-authenticated edit view backed by a small API (imports currently
-  publish by replacing `data.js`, which keeps the site static and free to host).
+`files/` holds student names and USNs — keep it out of any public repo.

@@ -3,274 +3,185 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dept Dashboard — CSE (Data Science) · DSATM</title>
+<title>DSATM · CSE (Data Science) — Department Dashboard</title>
 <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
 
-<header class="topbar">
+<header class="top">
   <div class="brand">
-    <div class="logo" aria-hidden="true">
-      <svg viewBox="0 0 40 40" width="38" height="38"><rect x="1.5" y="1.5" width="37" height="37" rx="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="27" r="2.6" fill="currentColor"/><circle cx="20" cy="14" r="2.6" fill="currentColor"/><circle cx="28" cy="24" r="2.6" fill="currentColor"/><circle cx="29" cy="10" r="2.6" fill="currentColor"/><path d="M12 27 20 14 28 24M20 14 29 10M12 27 28 24" stroke="currentColor" stroke-width="1.6" fill="none" opacity=".65"/></svg>
-    </div>
+    <svg class="logo" viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="37" height="37" rx="10" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="27" r="2.6" fill="currentColor"/><circle cx="20" cy="14" r="2.6" fill="currentColor"/>
+      <circle cx="28" cy="24" r="2.6" fill="currentColor"/><circle cx="29" cy="10" r="2.6" fill="currentColor"/>
+      <path d="M12 27 20 14 28 24M20 14 29 10M12 27 28 24" stroke="currentColor" stroke-width="1.6" fill="none" opacity=".6"/>
+    </svg>
     <div>
-      <h1 id="deptName">CSE (Data Science)</h1>
-      <p class="brand-sub"><span id="collegeName">DSATM</span> · Department Dashboard</p>
+      <h1>CSE (Data Science)</h1>
+      <p class="sub">DSATM · Department Dashboard</p>
     </div>
   </div>
-
-  <div class="topbar-actions">
-    <label class="field">
-      <span>Academic year</span>
-      <select id="yearSelect"></select>
-    </label>
-    <button class="pill-btn" id="importBtn" title="Import placements / publications from Excel">⇪ Import Excel</button>
-    <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
-    <button class="icon-btn" id="adminBtn" title="Admin / edit data" aria-label="Admin">✎</button>
+  <div class="actions">
+    <label class="year">Academic year <select id="yearSel"></select></label>
+    <button class="ghost" id="adminBtn" aria-pressed="false">✎ Admin</button>
+    <button class="icon" id="themeBtn" aria-label="Toggle theme">◐</button>
   </div>
 </header>
 
+<div class="adminbar" id="adminbar" hidden>
+  <span><b>Admin mode</b> — add, edit and delete anything; changes stay in this browser until you export.</span>
+  <div class="adminbar-actions">
+    <button class="ghost" id="exportBtn">Export data.js</button>
+    <button class="ghost" id="resetBtn">Reset changes</button>
+  </div>
+</div>
+
 <nav class="tabs" id="tabs" role="tablist">
-  <button class="tab active" data-tab="overview" role="tab">Overview</button>
-  <button class="tab" data-tab="placements" role="tab">Placements</button>
-  <button class="tab" data-tab="research" role="tab">Research</button>
-  <button class="tab" data-tab="calendar" role="tab">Calendar</button>
-  <button class="tab" data-tab="faculty" role="tab">Faculty</button>
+  <button class="tab active" data-tab="overview">Overview</button>
+  <button class="tab" data-tab="placements">Placements</button>
+  <button class="tab" data-tab="plan">Placement plan</button>
+  <button class="tab" data-tab="research">Research</button>
+  <button class="tab" data-tab="faculty">Faculty</button>
 </nav>
 
 <main>
-
-  <!-- ============ OVERVIEW ============ -->
-  <section class="panel active" id="panel-overview">
-    <div class="kpis" id="kpiGrid"></div>
-    <div class="grid-2">
+  <!-- OVERVIEW -->
+  <section class="panel active" id="p-overview">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid c2">
       <article class="card">
-        <header class="card-head"><h2>Placement trend</h2><span class="hint">students placed / eligible</span></header>
-        <div id="trendChart" class="chart-wrap"></div>
-      </article>
-      <article class="card">
-        <header class="card-head"><h2>What's next</h2><span class="hint">next 5 department dates</span></header>
-        <ul class="next-list" id="nextList"></ul>
-      </article>
-    </div>
-    <div class="grid-2">
-      <article class="card">
-        <header class="card-head"><h2>Research output</h2><span class="hint">this academic year</span></header>
-        <div id="researchMini" class="chart-wrap"></div>
-      </article>
-      <article class="card">
-        <header class="card-head"><h2>Headline numbers</h2><span class="hint">selected year</span></header>
-        <div id="headlines" class="headlines"></div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ============ PLACEMENTS ============ -->
-  <section class="panel" id="panel-placements">
-    <div class="stat-row" id="placementStats"></div>
-    <div class="grid-2">
-      <article class="card">
-        <header class="card-head"><h2>Package distribution</h2><span class="hint">offers by CTC band</span></header>
-        <div id="packageChart" class="chart-wrap"></div>
-      </article>
-      <article class="card">
-        <header class="card-head"><h2>Offer split</h2><span class="hint">by role family</span></header>
-        <div id="roleSplit" class="chart-wrap"></div>
-      </article>
-    </div>
-    <article class="card">
-      <header class="card-head">
-        <h2>Recruiters</h2>
-        <span class="hint" id="recruiterCount"></span>
-      </header>
-      <div class="table-wrap">
-        <table class="data-table" id="recruiterTable">
-          <thead>
-            <tr><th>Company</th><th>Sector</th><th class="num">Offers</th><th>Role</th><th class="num">CTC (LPA)</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </article>
-    <article class="card">
-      <header class="card-head"><h2>Year-on-year</h2><span class="hint">placement summary, last 4 cycles</span></header>
-      <div class="table-wrap">
-        <table class="data-table" id="placementYearTable">
-          <thead><tr><th>Academic year</th><th class="num">Eligible</th><th class="num">Placed</th><th class="num">Higher studies</th><th class="num">Offers</th><th class="num">Avg CTC</th><th class="num">Highest</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </article>
-  </section>
-
-  <!-- ============ RESEARCH ============ -->
-  <section class="panel" id="panel-research">
-    <div class="stat-row" id="researchStats"></div>
-    <article class="card">
-      <header class="card-head">
-        <h2>Publications, patents &amp; grants</h2>
-        <span class="hint" id="researchCount"></span>
-      </header>
-      <div class="filters">
-        <input type="search" id="researchSearch" placeholder="Search title, author, venue…" />
-        <select id="filterType"><option value="">All types</option></select>
-        <select id="filterFaculty"><option value="">All faculty</option></select>
-        <select id="filterYear"><option value="">All years</option></select>
-      </div>
-      <div class="table-wrap">
-        <table class="data-table" id="researchTable">
-          <thead><tr><th>Title</th><th>Type</th><th>Faculty</th><th>Venue / details</th><th>Indexing</th><th>Year</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </article>
-    <div class="grid-2">
-      <article class="card">
-        <header class="card-head"><h2>Output by year</h2><span class="hint">stacked by type</span></header>
-        <div id="researchYearChart" class="chart-wrap"></div>
-      </article>
-      <article class="card">
-        <header class="card-head"><h2>Faculty-wise output</h2><span class="hint">papers, patents, grants</span></header>
-        <div id="facultyOutput" class="chart-wrap"></div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ============ CALENDAR ============ -->
-  <section class="panel" id="panel-calendar">
-    <div class="stat-row" id="calendarStats"></div>
-    <div class="grid-2">
-      <article class="card">
-        <header class="card-head"><h2>Upcoming</h2><span class="hint">IA, SEE, events &amp; deadlines</span></header>
-        <div class="filters">
-          <select id="filterEventType"><option value="">All types</option></select>
-          <label class="check"><input type="checkbox" id="onlyUpcoming" checked /> upcoming only</label>
+        <div class="card-head"><h2>Placement progress</h2><span class="hint" id="progHint"></span></div>
+        <div class="row2">
+          <div id="donutPlacement" class="viz"></div>
+          <div id="placementMini" class="mini-stats"></div>
         </div>
-        <ul class="timeline" id="eventList"></ul>
       </article>
-      <div class="stack">
-        <article class="card">
-          <header class="card-head"><h2>Internal assessment schedule</h2><span class="hint">semester plan</span></header>
-          <div class="table-wrap">
-            <table class="data-table" id="iaTable">
-              <thead><tr><th>Assessment</th><th>Window</th><th>Coverage</th><th>Marks</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </article>
-        <article class="card">
-          <header class="card-head"><h2>Semester map</h2><span class="hint">odd / even cycle</span></header>
-          <div id="semesterMap" class="sem-map"></div>
-        </article>
-      </div>
+      <article class="card">
+        <div class="card-head"><h2>Offers by package band</h2><span class="hint">all offers this year</span></div>
+        <div id="bandMini" class="viz"></div>
+      </article>
     </div>
+    <div class="grid c2">
+      <article class="card">
+        <div class="card-head"><h2>Publications by month</h2><span class="hint">Scopus / WoS</span></div>
+        <div id="pubMonths" class="viz"></div>
+      </article>
+      <article class="card">
+        <div class="card-head"><h2>Placement plan at a glance</h2><span class="hint">open the plan tab for detail</span></div>
+        <div id="planMini" class="mini-list"></div>
+      </article>
+    </div>
+    <article class="card">
+      <div class="card-head"><h2>Year-wise numbers</h2><span class="hint">placed · offers · companies · CTC</span></div>
+      <div class="table-wrap" id="yearTableOverview"></div>
+    </article>
+  </section>
+  <section class="panel" id="p-placements">
+    <div class="section-head">
+      <h2>Placements · <span id="pYear"></span></h2>
+      <button class="ghost admin-only" data-add="offer">+ Add offer</button>
+    </div>
+    <div class="chips" id="placeChips"></div>
+    <div class="chips" id="overallChips"></div>
+    <div class="grid c2">
+      <article class="card">
+        <div class="card-head"><h2>Placed vs eligible</h2><span class="hint" id="eligHint"></span></div>
+        <div class="row2">
+          <div id="donutPlacements" class="viz"></div>
+          <div id="placeMini" class="mini-stats"></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-head"><h2>Package bands</h2><span class="hint">offers by CTC</span></div>
+        <div id="bandFull" class="viz"></div>
+      </article>
+    </div>
+    <article class="card">
+      <div class="card-head"><h2>Top recruiters</h2><span class="hint" id="recHint"></span></div>
+      <div id="companies" class="viz"></div>
+    </article>
+    <article class="card">
+      <div class="card-head"><h2>All cycles at a glance</h2><span class="hint">every placement year on record</span></div>
+      <div class="table-wrap" id="yearTablePlacements"></div>
+    </article>
+    <article class="card admin-list-card">
+      <div class="card-head"><h2>Offer list</h2><span class="hint">every row from the placement sheet</span></div>
+      <ul class="rows" id="offerList"></ul>
+    </article>
   </section>
 
-  <!-- ============ FACULTY ============ -->
-  <section class="panel" id="panel-faculty">
-    <div class="faculty-grid" id="facultyGrid"></div>
+  <!-- PLAN -->
+  <section class="panel" id="p-plan">
+    <div class="section-head">
+      <h2>Placement plan · <span id="planYear"></span></h2>
+      <button class="ghost admin-only" data-add="planItem">+ Add plan item</button>
+    </div>
+    <article class="card">
+      <div class="card-head"><h2>Targets</h2><span class="hint" id="planStatus"></span></div>
+      <div class="plan-targets" id="planTargets"></div>
+    </article>
+    <div class="plan-cards" id="planCards"></div>
   </section>
 
+  <!-- RESEARCH -->
+  <section class="panel" id="p-research">
+    <div class="section-head">
+      <h2>Research · <span id="rYear"></span></h2>
+      <button class="ghost admin-only" data-add="paper">+ Add publication</button>
+    </div>
+    <div class="chips" id="resChips"></div>
+    <div class="grid c2">
+      <article class="card">
+        <div class="card-head"><h2>Papers per faculty</h2><span class="hint">this academic year</span></div>
+        <div id="facPubs" class="viz"></div>
+      </article>
+      <article class="card">
+        <div class="card-head"><h2>Output mix</h2><span class="hint">journals vs conferences</span></div>
+        <div class="row2">
+          <div id="typeDonut" class="viz"></div>
+          <div id="typeMini" class="mini-stats"></div>
+        </div>
+      </article>
+    </div>
+    <article class="card">
+      <div class="card-head"><h2>Year-wise output</h2><span class="hint">papers, patents and quartiles</span></div>
+      <div class="table-wrap" id="yearTableResearch"></div>
+    </article>
+    <article class="card">
+      <div class="card-head"><h2>Listed publications</h2><span class="hint" id="resHint"></span></div>
+      <ul class="rows" id="paperList"></ul>
+    </article>
+  </section>
+
+  <!-- FACULTY -->
+  <section class="panel" id="p-faculty">
+    <div class="section-head">
+      <h2>Faculty</h2>
+      <button class="ghost admin-only" data-add="faculty">+ Add faculty</button>
+    </div>
+    <div class="chips" id="facSummary"></div>
+    <div class="fac-grid" id="facGrid"></div>
+  </section>
 </main>
 
-<footer class="foot">
+<footer>
   <span id="footLeft"></span>
   <span id="footRight"></span>
 </footer>
 
-<!-- ============ ADMIN DRAWER ============ -->
-<aside class="drawer" id="adminDrawer" aria-hidden="true">
-  <header class="drawer-head">
-    <h2>Edit dashboard data</h2>
-    <button class="icon-btn" id="closeAdmin" aria-label="Close">✕</button>
-  </header>
-  <p class="note">Changes save to this browser only. Click <b>Export data.js</b> and replace <code>assets/data.js</code> to publish them for everyone.</p>
-
-  <div class="drawer-body">
-    <details open class="imp-box">
-      <summary>Import from Excel / CSV</summary>
-      <p class="imp-note">Sheets are recognised by their header row, so names and order are free:
-        <b>Placements</b> (one row per academic year), <b>Recruiters</b>, <b>Research</b>
-        (papers, patents, grants), <b>Events</b>. Parsed in the browser — nothing is uploaded.</p>
-      <div class="imp-controls">
-        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" />
-        <button class="btn ghost" id="templateBtn" type="button">Download template .xlsx</button>
-      </div>
-      <label class="check" style="margin:9px 0">
-        <input type="checkbox" id="importMergeResearch" /> add publications to existing list (unchecked = replace)
-      </label>
-      <div class="imp-preview" id="importPreview"></div>
-      <button class="btn" id="importApply" disabled>Apply to dashboard</button>
-      <p class="note imp-status" id="importStatus">Waiting for a file.</p>
-    </details>
-
-    <details open>
-      <summary>Add recruiter / offer</summary>
-      <div class="form-grid">
-        <label>Company<input id="f-co-name" placeholder="e.g. Tredence" /></label>
-        <label>Sector<input id="f-co-sector" placeholder="Analytics" /></label>
-        <label>Offers<input id="f-co-offers" type="number" min="1" value="1" /></label>
-        <label>Role<input id="f-co-role" placeholder="Data Analyst" /></label>
-        <label>CTC (LPA)<input id="f-co-ctc" type="number" step="0.1" placeholder="6.5" /></label>
-        <button class="btn" data-add="recruiter">Add</button>
-      </div>
-    </details>
-
-    <details>
-      <summary>Add publication / patent / grant</summary>
-      <div class="form-grid">
-        <label>Type
-          <select id="f-re-type">
-            <option>Journal</option><option>Conference</option><option>Patent</option>
-            <option>Book chapter</option><option>Grant</option>
-          </select>
-        </label>
-        <label>Year<input id="f-re-year" type="number" value="2026" /></label>
-        <label class="wide">Title<input id="f-re-title" placeholder="Paper or patent title" /></label>
-        <label>Faculty (comma sep.)<input id="f-re-faculty" placeholder="Dr. A, Prof. B" /></label>
-        <label>Venue / details<input id="f-re-venue" placeholder="Journal name / patent no." /></label>
-        <label>Indexing
-          <select id="f-re-index">
-            <option>SCI</option><option>Scopus</option><option>UGC-CARE</option>
-            <option>WoS</option><option>Granted</option><option>Published</option>
-          </select>
-        </label>
-        <label class="wide">DOI / link<input id="f-re-doi" placeholder="https://…" /></label>
-        <button class="btn" data-add="research">Add</button>
-      </div>
-    </details>
-
-    <details>
-      <summary>Add calendar date</summary>
-      <div class="form-grid">
-        <label>Date<input id="f-ev-date" type="date" /></label>
-        <label>End date (optional)<input id="f-ev-end" type="date" /></label>
-        <label>Type
-          <select id="f-ev-type">
-            <option value="ia">IA</option><option value="exam">SEE / Exam</option>
-            <option value="event">Event</option><option value="deadline">Deadline</option>
-            <option value="holiday">Holiday</option>
-          </select>
-        </label>
-        <label class="wide">Title<input id="f-ev-title" placeholder="IA-3 — DBMS" /></label>
-        <label class="wide">Detail<input id="f-ev-detail" placeholder="Units 1–3, 50 marks" /></label>
-        <label>Venue / time<input id="f-ev-venue" placeholder="Block C, 9:30 AM" /></label>
-        <button class="btn" data-add="event">Add</button>
-      </div>
-    </details>
-
-    <div class="drawer-foot">
-      <button class="btn ghost" id="exportBtn">Export data.js</button>
-      <button class="btn ghost" id="resetBtn">Discard local changes</button>
+<!-- EDIT DIALOG -->
+<dialog id="editDlg">
+  <form method="dialog" id="editForm">
+    <h2 id="dlgTitle">Edit</h2>
+    <div class="fields" id="dlgFields"></div>
+    <div class="dlg-actions">
+      <button type="button" class="ghost" id="dlgCancel">Cancel</button>
+      <button type="button" class="primary" id="dlgSave">Save</button>
     </div>
-    <p class="note" id="adminStatus"></p>
-  </div>
-</aside>
-<div class="scrim" id="scrim"></div>
+  </form>
+</dialog>
 
-<script src="assets/vendor/xlsx.full.min.js"></script>
 <script src="assets/data.js"></script>
 <script src="assets/app.js"></script>
-<script src="assets/import.js"></script>
 </body>
 </html>

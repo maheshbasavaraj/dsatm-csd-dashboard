@@ -1,0 +1,109 @@
+{
+  "_note": "Draft placement action plan for CSE (Data Science). Targets are proposals for HOD approval — edit this file and re-run tools/build-data.js to publish. Baselines are the verified numbers from files/PLACEMENT ANALYSIS.xlsx.",
+  "status": "Draft — pending HOD approval",
+  "owner": "Dr. Sumithra Devi K A (Head) · Placement Coordinator: Mr. S R V Prasad Reddy",
+  "targets": {
+    "ay": "2026-27",
+    "eligible": 68,
+    "placed": 55,
+    "offers": 65,
+    "avgCtc": 6.5,
+    "companies": 45,
+    "higherStudies": 6,
+    "internships": 45
+  },
+  "baseline": [
+    { "label": "2025-26 batch placed", "value": "27 students" },
+    { "label": "2026-27 placed so far", "value": "10 students" },
+    { "label": "Batch strength (2023 batch)", "value": "68 students" },
+    { "label": "Highest offer on record", "value": "₹10 LPA (Perfios, Adyapan)" }
+  ],
+  "initiatives": [
+    {
+      "area": "Aptitude & coding readiness",
+      "action": "Daily 90-minute aptitude + DSA drill from semester 4; weekly timed assessment with score tracking on the dashboard.",
+      "owner": "Placement Coordinator",
+      "window": "Jul – Nov 2026",
+      "status": "Ongoing",
+      "metric": "80% of eligible batch clearing AMCAT / CoCubes cut-off"
+    },
+    {
+      "area": "Resume & profile clinic",
+      "action": "Two-pass review (technical + language) of every resume, LinkedIn and GitHub profile; one-page data-project portfolio template issued.",
+      "owner": "Mr. Mahesh Basavaraj",
+      "window": "Aug – Sep 2026",
+      "status": "Ongoing",
+      "metric": "100% resumes reviewed and signed off before first drive"
+    },
+    {
+      "area": "Mock interview cycle",
+      "action": "Three rounds per student: technical (SQL / ML / Python), case (analytics), HR. Panel includes alumni working in analytics roles.",
+      "owner": "Mr. S Saravanan",
+      "window": "Sep – Nov 2026, repeat Feb 2027",
+      "status": "Planned",
+      "metric": "3 rounds per student, average score ≥ 7/10"
+    },
+    {
+      "area": "Recruiter pipeline",
+      "action": "Add 15 analytics / product firms (Tredence, Sigmoid, Mu Sigma, LatentView, Tiger Analytics, PhonePe, Zerodha-class) via alumni and industry-cell referrals; two MoUs per semester.",
+      "owner": "Head of Department",
+      "window": "Rolling, reviewed monthly",
+      "status": "Ongoing",
+      "metric": "45 companies on campus, ≥ 20 from analytics / product"
+    },
+    {
+      "area": "Internship-to-FTE conversion",
+      "action": "Mandatory 6-week summer internship after semester 4 and 6-month internship in semester 8; track offer conversion as a first-class metric.",
+      "owner": "Dr. K Harshavardhana Reddy",
+      "window": "Jun – Jul 2027 and Jan – Jun 2027",
+      "status": "Planned",
+      "metric": "45 internships secured, ≥ 30% converting to full-time offers"
+    },
+    {
+      "area": "Alumni referral drive",
+      "action": "Alumni connect session each semester, referral tracker with 20 target referrals per cycle, and a standing alumni-mentor pool.",
+      "owner": "Mrs. Lakshmi S R",
+      "window": "Nov 2026 and Mar 2027",
+      "status": "Planned",
+      "metric": "20 referrals per cycle, ≥ 5 converting to interviews"
+    },
+    {
+      "area": "Certification sponsorship",
+      "action": "Sponsored certification slots (AWS Cloud Practitioner, Azure DP-900, Google Advanced Data Analytics, Databricks Associate) prioritised by attendance and aptitude scores.",
+      "owner": "Mr. Kartik Sharma",
+      "window": "Aug 2026 – Mar 2027",
+      "status": "Planned",
+      "metric": "50 certifications earned across the batch"
+    },
+    {
+      "area": "Higher-studies track",
+      "action": "Separate GATE / GRE mentoring track from semester 5, weekly problem sessions, and application support for GATE, GRE and CAT aspirants.",
+      "owner": "Dr. Sachchida Nand Mishra",
+      "window": "Jul 2026 – Feb 2027",
+      "status": "Planned",
+      "metric": "6 higher-studies admissions, 3 with funded offers"
+    },
+    {
+      "area": "Placement analytics review",
+      "action": "Monthly review of this dashboard (placement %, recruiter mix, offer quality, IA/aptitude correlation) in the department meeting; actions logged against owners.",
+      "owner": "Head of Department",
+      "window": "First Monday, monthly",
+      "status": "Ongoing",
+      "metric": "12 reviews per year, minutes circulated within 48 hours"
+    },
+    {
+      "area": "Placement-readiness gate",
+      "action": "Students below 75% attendance or below cut-off aptitude scores are routed to remediation before being allowed to sit for drives; parents informed where needed.",
+      "owner": "Class Advisors + Placement Coordinator",
+      "window": "From semester 5",
+      "status": "Proposed",
+      "metric": "Zero students debarred for attendance at the first drive"
+    }
+  ],
+  "timeline": [
+    { "phase": "Build", "months": "Jul – Sep 2026", "milestone": "Aptitude baseline tests, resume sign-off, mock round 1, first 10 recruiters added" },
+    { "phase": "Drive", "months": "Oct – Dec 2026", "milestone": "Main placement season: analytics and IT-services drives, mock round 2" },
+    { "phase": "Convert", "months": "Jan – Mar 2027", "milestone": "Internship conversions, off-campus pipeline, second drive window, mock round 3" },
+    { "phase": "Close", "months": "Apr – Jun 2027", "milestone": "Backlog clearing, result-awaiting cases, final placement report for the AY" }
+  ]
+}
