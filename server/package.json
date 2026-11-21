@@ -1,0 +1,16 @@
+{
+  "name": "dsatm-csd-dashboard-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SQLite + Express API for the DSATM CSE (Data Science) department dashboard",
+  "type": "commonjs",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node index.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.5.0",
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,22 @@
+# Render blueprint — one Node service running the API + the static dashboard.
+# The SQLite file lives on a persistent disk so edits survive deploys/restarts.
+services:
+  - type: web
+    name: dsatm-csd-dashboard
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install --omit=dev
+    startCommand: node index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: ADMIN_PASSWORD
+        sync: false          # set this in the Render dashboard — shared admin password
+      - key: SECRET
+        generateValue: true  # token signing key
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: dept-data
+      mountPath: /var/data
+      sizeGB: 1

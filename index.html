@@ -26,6 +26,7 @@
     </div>
   </div>
   <div class="actions">
+    <span class="db-badge" id="dbBadge" hidden>SQLite</span>
     <label class="year">Academic year <select id="yearSel"></select></label>
     <button class="ghost" id="adminBtn" aria-pressed="false">✎ Admin</button>
     <button class="icon" id="themeBtn" aria-label="Toggle theme">◐</button>
@@ -33,10 +34,11 @@
 </header>
 
 <div class="adminbar" id="adminbar" hidden>
-  <span><b>Admin mode</b> — add, edit and delete anything; changes stay in this browser until you export.</span>
+  <span><b>Admin mode</b> · <span id="modeNote">changes stay in this browser until you export.</span></span>
   <div class="adminbar-actions">
     <button class="ghost" id="exportBtn">Export data.js</button>
     <button class="ghost" id="resetBtn">Reset changes</button>
+    <button class="ghost" id="signOutBtn">Sign out</button>
   </div>
 </div>
 
@@ -183,6 +185,22 @@
     <div class="dlg-actions">
       <button type="button" class="ghost" id="dlgCancel">Cancel</button>
       <button type="button" class="primary" id="dlgSave">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="loginDlg">
+  <form method="dialog" onsubmit="return false">
+    <h2>Admin sign in</h2>
+    <div class="fields">
+      <label class="wide">Shared admin password
+        <input type="password" id="loginPw" autocomplete="current-password" placeholder="department admin password" />
+      </label>
+    </div>
+    <p class="login-err" id="loginErr"></p>
+    <div class="dlg-actions">
+      <button type="button" class="ghost" id="loginCancel">Cancel</button>
+      <button type="button" class="primary" id="loginGo">Sign in</button>
     </div>
   </form>
 </dialog>

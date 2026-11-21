@@ -44,6 +44,91 @@ let D = (() => {
 const state = { year: D.meta.activeYear, tab: "overview", admin: false, dirty: false };
 if (!D.years.includes(state.year)) state.year = D.years[0];
 
+/* ---------------- server mode (SQLite API) ----------------
+   When the page is served by server/index.js, /api/data is reachable and
+   writes go to SQLite. Opened as a file:// page, it falls back to the
+   baked-in data.js + localStorage overlay. */
+const API_BASE = location.protocol.startsWith("http") ? "" : null;
+let apiMode = false;
+let token = sessionStorage.getItem("dsatm_token") || "";
+
+const apiFetch = async (path, opts = {}) => {
+  const res = await fetch(API_BASE + path, {
+    ...opts,
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: "Bearer " + token } : {}), ...(opts.headers || {}) }
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || res.statusText);
+  return body;
+};
+
+async function refreshFromServer() {
+  const doc = await apiFetch("/api/data");
+  D = doc;
+  if (!D.years.includes(state.year)) state.year = D.years[0];
+  renderAll();
+}
+
+const ENDPOINTS = {
+  offer: {
+    path: "/api/offers",
+    make: (rec) => ({ ay: state.year, student: rec.student, company: rec.company, ctc: Number(rec.ctc) || 0, usn: rec.usn || null })
+  },
+  paper: {
+    path: "/api/publications",
+    make: (rec) => {
+      const y = Number(rec.year) || Number(state.year.slice(0, 4));
+      const m = Number(rec.month) || null;
+      return {
+        ay: ayOf(y, m), year: y, month: m, type: rec.type, title: rec.title,
+        faculty: rec.faculty || [], venue: rec.venue || "", indexing: rec.indexing || "Scopus",
+        quartile: rec.quartile || "", doi: rec.doi || ""
+      };
+    }
+  },
+  faculty: {
+    path: "/api/faculty",
+    make: (rec) => ({
+      name: rec.name, designation: rec.designation, qualification: rec.qualification,
+      area: rec.area, hIndex: rec.hIndex === "" ? null : rec.hIndex
+    })
+  },
+  planItem: {
+    path: "/api/plan-items",
+    make: (rec) => ({
+      title: rec.title, detail: rec.detail, status: rec.status, meta: rec.meta,
+      progress: Number(rec.progress) || 0
+    })
+  }
+};
+
+async function commit(kind, index, rec) {
+  const sc = SCHEMA[kind];
+  if (!apiMode) {
+    if (index == null) sc.add(rec); else sc.apply(index, rec);
+    saveStore(); renderAll(); return;
+  }
+  const ep = ENDPOINTS[kind];
+  const existing = index == null ? null : sc.target()[index];
+  try {
+    if (existing && existing.id) await apiFetch(ep.path + "/" + existing.id, { method: "PUT", body: JSON.stringify(ep.make(rec)) });
+    else await apiFetch(ep.path, { method: "POST", body: JSON.stringify(ep.make(rec)) });
+    await refreshFromServer();
+  } catch (err) {
+    alert("Save failed: " + err.message);
+  }
+}
+
+async function commitDelete(kind, index) {
+  const sc = SCHEMA[kind];
+  const existing = sc.target()[index];
+  if (!apiMode) { sc.target().splice(index, 1); saveStore(); renderAll(); return; }
+  try {
+    if (existing && existing.id) await apiFetch(ENDPOINTS[kind].path + "/" + existing.id, { method: "DELETE" });
+    await refreshFromServer();
+  } catch (err) { alert("Delete failed: " + err.message); }
+}
+
 /* ---------------- derived numbers ---------------- */
 function stats(ay) {
   const p = D.placement[ay] || { offers: [], eligible: null };
@@ -523,9 +608,8 @@ function saveDialog() {
     if (f.list) v = String(v).split(",").map(s => s.trim()).filter(Boolean);
     rec[f.k] = v;
   });
-  if (editing.index == null) sc.add(rec); else sc.apply(editing.index, rec);
-  saveStore();
-  renderAll();
+  if (editing.index == null) commit(editing.kind, null, rec);
+  else commit(editing.kind, editing.index, rec);
 }
 
 document.addEventListener("click", (e) => {
@@ -540,11 +624,8 @@ document.addEventListener("click", (e) => {
   if (t.dataset.del) {
     const kind = t.dataset.del, i = Number(t.dataset.i);
     const label = kind === "paper" ? "publication" : kind === "planItem" ? "plan item" : kind;
-    if (!confirm(`Delete this ${label}? This only affects this browser until you export.`)) return;
-    const sc = SCHEMA[kind];
-    sc.target().splice(i, 1);
-    saveStore();
-    renderAll();
+    if (!confirm(`Delete this ${label}?`)) return;
+    commitDelete(kind, i);
   }
 });
 
@@ -562,11 +643,44 @@ $("#tabs").addEventListener("click", (e) => {
 });
 $("#yearSel").addEventListener("change", (e) => { state.year = e.target.value; renderAll(); });
 
+function setAdminUI(on) {
+  state.admin = on;
+  document.body.classList.toggle("admin", on);
+  $("#adminBtn").setAttribute("aria-pressed", String(on));
+  $("#adminbar").hidden = !on;
+  const note = $("#modeNote");
+  if (note) note.textContent = apiMode
+    ? "Signed in · changes save to the department database for everyone."
+    : "Offline mode · changes save in this browser only until you export data.js.";
+}
+
 $("#adminBtn").addEventListener("click", () => {
-  state.admin = !state.admin;
-  document.body.classList.toggle("admin", state.admin);
-  $("#adminBtn").setAttribute("aria-pressed", String(state.admin));
-  $("#adminbar").hidden = !state.admin;
+  if (state.admin) return setAdminUI(false);
+  if (apiMode && !token) return $("#loginDlg").showModal();
+  setAdminUI(true);
+});
+
+/* login dialog */
+$("#loginGo").addEventListener("click", async () => {
+  const pw = $("#loginPw").value;
+  try {
+    const out = await apiFetch("/api/login", { method: "POST", body: JSON.stringify({ password: pw }) });
+    token = out.token;
+    sessionStorage.setItem("dsatm_token", token);
+    $("#loginDlg").close();
+    $("#loginPw").value = "";
+    setAdminUI(true);
+  } catch (err) {
+    $("#loginErr").textContent = err.message;
+  }
+});
+$("#loginCancel").addEventListener("click", () => $("#loginDlg").close());
+$("#loginPw").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#loginGo").click(); });
+
+$("#signOutBtn").addEventListener("click", () => {
+  token = "";
+  sessionStorage.removeItem("dsatm_token");
+  setAdminUI(false);
 });
 
 $("#themeBtn").addEventListener("click", () => {
@@ -591,9 +705,36 @@ $("#exportBtn").addEventListener("click", () => {
 });
 
 $("#resetBtn").addEventListener("click", () => {
+  if (apiMode) {
+    if (!confirm("Sign out of admin mode?")) return;
+    token = ""; sessionStorage.removeItem("dsatm_token"); setAdminUI(false); return;
+  }
   if (!confirm("Discard all local edits and reload from assets/data.js?")) return;
   localStorage.removeItem(KEY);
   location.reload();
 });
 
-renderAll();
+/* boot: prefer the SQLite API, fall back to the baked-in data.js */
+(async function boot() {
+  window.__apiErr = null;
+  if (API_BASE !== null) {
+    try {
+      const doc = await apiFetch("/api/data");
+      if (doc && doc.years && doc.years.length) {
+        D = doc;
+        apiMode = true;
+      } else {
+        window.__apiErr = "empty doc";
+      }
+    } catch (err) {
+      window.__apiErr = err.message;
+      console.warn("API unavailable, using static data:", err.message);
+    }
+  }
+  if (!D.years.includes(state.year)) state.year = D.years[0];
+  renderAll();
+  const badge = $("#dbBadge");
+  if (badge) badge.hidden = !apiMode;
+  const rb = $("#resetBtn");
+  if (rb) rb.textContent = apiMode ? "Sign out" : "Reset changes";
+})();

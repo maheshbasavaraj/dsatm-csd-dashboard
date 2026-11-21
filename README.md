@@ -21,6 +21,59 @@ Four tabs. Overview leads with research, then placements — the order the depar
 2 hackathons planned · advanced database workshop, 5th sem ongoing · advanced database workshop,
 7th sem completed.
 
+## Database — SQLite + Express (`server/`)
+
+The dashboard now runs against a real database when served by the Node app.
+Opened as a plain file (or from GitHub Pages) it still works read-only from `assets/data.js`.
+
+```
+server/
+  index.js      Express: /api/* + serves the dashboard itself
+  db.js         SQLite schema, seed, read-model (returns the exact data.js shape)
+  data/dept.db  the database (gitignored)
+render.yaml     one-service deploy blueprint with a persistent disk
+```
+
+Tables: `years`, `offers`, `publications`, `faculty`, `support_staff`, `patents`,
+`plan_items`, `settings`. First boot seeds them from `assets/data.js` (67 publications,
+44 offers, 12 faculty rows, 5 plan items).
+
+**Run locally**
+
+```bash
+cd server
+npm install
+ADMIN_PASSWORD=yourpassword PORT=3100 node index.js
+# open http://127.0.0.1:3100   → header shows a "SQLite" badge
+```
+
+**API**
+
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| GET | `/api/data` | public | whole dataset in the dashboard's document shape |
+| GET | `/api/health` | public | `{ok, rows}` for uptime checks |
+| POST | `/api/login` | — | shared password → bearer token (12 h) |
+| POST/PUT/DELETE | `/api/offers[/:id]` | bearer | placement offer rows |
+| POST/PUT/DELETE | `/api/publications[/:id]` | bearer | papers / conference entries |
+| POST/PUT/DELETE | `/api/faculty[/:id]` | bearer | faculty records |
+| POST/PUT/DELETE | `/api/plan-items[/:id]` | bearer | placement plan cards |
+| PUT | `/api/years/:label` | bearer | eligible strength for a year |
+| PUT | `/api/patents/:ay` | bearer | patent count for a year |
+
+Writes require the shared admin password (`ADMIN_PASSWORD`); the browser keeps the token in
+`sessionStorage` and shows "Signed in · changes save to the department database" in the admin bar.
+
+**Deploy on Render**
+
+1. Push this repo, then Render → New → Blueprint → pick the repo (`render.yaml` is read).
+2. Set `ADMIN_PASSWORD` when prompted (the only manual step).
+3. Deploy. `DATA_DIR=/var/data` on the 1 GB disk keeps `dept.db` across restarts.
+4. Share the Render URL; GitHub Pages stays as a read-only snapshot.
+
+`files/` and `server/` are blocked from static serving by the API process, so student lists never
+leak through the web server.
+
 ## Admin — create, edit, delete on every tab
 
 Click **✎ Admin** in the header. Then:
